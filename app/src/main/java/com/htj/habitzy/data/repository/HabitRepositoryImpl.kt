@@ -12,6 +12,7 @@ import com.htj.habitzy.domain.model.HabitIcon
 import com.htj.habitzy.domain.model.HabitLog
 import com.htj.habitzy.domain.model.HabitSchedule
 import com.htj.habitzy.domain.model.HabitType
+import com.htj.habitzy.domain.model.DayNote
 import com.htj.habitzy.domain.repository.HabitRepository
 import java.time.DayOfWeek
 import java.time.Instant
@@ -139,17 +140,18 @@ class HabitRepositoryImpl @Inject constructor(
         logDao.observeAllLogsInRange(range.start.toEpochDay(), range.endInclusive.toEpochDay())
             .map { list -> list.map(::toLog) }
 
+    override fun observeNotes(habitId: Long): Flow<List<DayNote>> =
+        noteDao.observeNotes(habitId).map { list -> list.map { toDayNote(it) } }
+
     override suspend fun setDayNote(habitId: Long, date: LocalDate, text: String, photoUri: String?) {
         val existing = noteDao.getNote(habitId, date.toEpochDay())
-        if (existing == null) {
+        if (existing != null) {
+            noteDao.deleteNote(habitId, date.toEpochDay())
+        }
+        if (text.isNotBlank() || photoUri != null) {
             noteDao.insert(
                 HabitNoteEntity(habitId = habitId, epochDay = date.toEpochDay(), text = text, photoUri = photoUri)
             )
-        } else {
-            // Update in place
-            if (photoUri != null) {
-                noteDao.insert(existing.copy(text = text, photoUri = photoUri))
-            }
         }
     }
 
@@ -240,6 +242,14 @@ class HabitRepositoryImpl @Inject constructor(
         amountValue = e.amountValue,
         checklistDoneMask = e.checklistDoneMask,
         completedAt = e.completedAtEpochMillis?.let(Instant::ofEpochMilli),
+    )
+
+    private fun toDayNote(e: com.htj.habitzy.data.local.db.entity.HabitNoteEntity): DayNote = DayNote(
+        id = e.id,
+        habitId = e.habitId,
+        date = LocalDate.ofEpochDay(e.epochDay),
+        text = e.text,
+        photoUri = e.photoUri,
     )
 
     private fun isFullyCompletedBuildingFromScratch(entity: HabitEntity): Boolean {

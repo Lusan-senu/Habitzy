@@ -2,6 +2,7 @@ package com.htj.habitzy.domain.repository
 
 import com.htj.habitzy.domain.model.Habit
 import com.htj.habitzy.domain.model.HabitLog
+import com.htj.habitzy.domain.model.DayNote
 import java.time.LocalDate
 import kotlinx.coroutines.flow.Flow
 
@@ -20,5 +21,6 @@ interface HabitRepository {
     suspend fun setChecklistStep(habitId: Long, date: LocalDate, stepIndex: Int, done: Boolean)
     fun observeLogs(habitId: Long, range: ClosedRange<LocalDate>): Flow<List<HabitLog>>
     fun observeAllLogsInRange(range: ClosedRange<LocalDate>): Flow<List<HabitLog>>
+    fun observeNotes(habitId: Long): Flow<List<DayNote>>
     suspend fun setDayNote(habitId: Long, date: LocalDate, text: String, photoUri: String?)
 }
