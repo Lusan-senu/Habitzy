@@ -13,6 +13,7 @@ import com.htj.habitzy.domain.model.HabitLog
 import com.htj.habitzy.domain.model.HabitSchedule
 import com.htj.habitzy.domain.model.HabitType
 import com.htj.habitzy.domain.model.DayNote
+import com.htj.habitzy.domain.model.Reminder
 import com.htj.habitzy.domain.repository.HabitRepository
 import java.time.DayOfWeek
 import java.time.Instant
@@ -37,6 +38,8 @@ class HabitRepositoryImpl @Inject constructor(
     override fun observeHabit(id: Long): Flow<Habit?> = habitDao.observeHabit(id).map { it?.let(::toHabit) }
 
     override suspend fun getUsedCategoryTags(): List<String> = habitDao.getUsedCategoryTags()
+
+    override suspend fun getNextSortOrder(): Int = habitDao.getNextSortOrder()
 
     override suspend fun createHabit(habit: Habit): Long = habitDao.insert(toEntity(habit))
 
@@ -142,6 +145,24 @@ class HabitRepositoryImpl @Inject constructor(
 
     override fun observeNotes(habitId: Long): Flow<List<DayNote>> =
         noteDao.observeNotes(habitId).map { list -> list.map { toDayNote(it) } }
+
+    override fun observeReminders(habitId: Long): Flow<List<Reminder>> =
+        reminderDao.observeReminders(habitId).map { list -> list.map(::toReminder) }
+
+    override suspend fun saveReminders(habitId: Long, reminders: List<Reminder>) {
+        reminderDao.deleteForHabit(habitId)
+        reminders.forEach { reminder ->
+            reminderDao.upsert(
+                com.htj.habitzy.data.local.db.entity.ReminderEntity(
+                    habitId = habitId,
+                    hour = reminder.hour,
+                    minute = reminder.minute,
+                    message = reminder.message,
+                    isEnabled = reminder.isEnabled,
+                )
+            )
+        }
+    }
 
     override suspend fun setDayNote(habitId: Long, date: LocalDate, text: String, photoUri: String?) {
         val existing = noteDao.getNote(habitId, date.toEpochDay())
@@ -250,6 +271,15 @@ class HabitRepositoryImpl @Inject constructor(
         date = LocalDate.ofEpochDay(e.epochDay),
         text = e.text,
         photoUri = e.photoUri,
+    )
+
+    private fun toReminder(e: com.htj.habitzy.data.local.db.entity.ReminderEntity): Reminder = Reminder(
+        id = e.id,
+        habitId = e.habitId,
+        hour = e.hour,
+        minute = e.minute,
+        message = e.message,
+        isEnabled = e.isEnabled,
     )
 
     private fun isFullyCompletedBuildingFromScratch(entity: HabitEntity): Boolean {

@@ -23,6 +23,9 @@ interface HabitDao {
     @Query("SELECT * FROM habits WHERE id = :id")
     suspend fun getHabit(id: Long): HabitEntity?
 
+    @Query("SELECT COALESCE(MAX(sortOrder), -1) + 1 FROM habits")
+    suspend fun getNextSortOrder(): Int
+
     @Query("SELECT DISTINCT categoryTag FROM habits WHERE categoryTag IS NOT NULL AND categoryTag != ''")
     suspend fun getUsedCategoryTags(): List<String>
 

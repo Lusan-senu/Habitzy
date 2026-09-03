@@ -3,6 +3,7 @@ package com.htj.habitzy.domain.repository
 import com.htj.habitzy.domain.model.Habit
 import com.htj.habitzy.domain.model.HabitLog
 import com.htj.habitzy.domain.model.DayNote
+import com.htj.habitzy.domain.model.Reminder
 import java.time.LocalDate
 import kotlinx.coroutines.flow.Flow
 
@@ -11,6 +12,7 @@ interface HabitRepository {
     fun observeArchivedHabits(): Flow<List<Habit>>
     fun observeHabit(id: Long): Flow<Habit?>
     suspend fun getUsedCategoryTags(): List<String>
+    suspend fun getNextSortOrder(): Int
     suspend fun createHabit(habit: Habit): Long
     suspend fun updateHabit(habit: Habit)
     suspend fun archiveHabit(id: Long, archived: Boolean)
@@ -23,4 +25,6 @@ interface HabitRepository {
     fun observeAllLogsInRange(range: ClosedRange<LocalDate>): Flow<List<HabitLog>>
     fun observeNotes(habitId: Long): Flow<List<DayNote>>
     suspend fun setDayNote(habitId: Long, date: LocalDate, text: String, photoUri: String?)
+    fun observeReminders(habitId: Long): Flow<List<Reminder>>
+    suspend fun saveReminders(habitId: Long, reminders: List<Reminder>)
 }
