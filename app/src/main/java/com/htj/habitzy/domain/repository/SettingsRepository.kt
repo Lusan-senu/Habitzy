@@ -1,5 +1,6 @@
 package com.htj.habitzy.domain.repository
 
+import com.htj.habitzy.data.local.datastore.AppIcon
 import com.htj.habitzy.data.local.datastore.AppPreferences
 import com.htj.habitzy.data.local.datastore.ProfilePreferences
 import com.htj.habitzy.data.local.datastore.ThemeMode
@@ -20,10 +21,13 @@ interface SettingsRepository {
     val defaultReminderMinute: Flow<Int>
     val autoBackupEnabled: Flow<Boolean>
     val autoBackupFrequencyDays: Flow<Int>
+    val backupFolderUri: Flow<String?>
     val appLockEnabled: Flow<Boolean>
+    val appLockPin: Flow<String?>
     val hapticsEnabled: Flow<Boolean>
     val notificationActions: Flow<Boolean>
     val lastCelebratedEpochDay: Flow<Long?>
+    val appIcon: Flow<AppIcon>
 
     suspend fun setThemeMode(mode: ThemeMode)
     suspend fun setUseDynamicColor(enabled: Boolean)
@@ -34,10 +38,13 @@ interface SettingsRepository {
     suspend fun setDefaultReminderMinute(minute: Int)
     suspend fun setAutoBackupEnabled(enabled: Boolean)
     suspend fun setAutoBackupFrequencyDays(days: Int)
+    suspend fun setBackupFolderUri(uri: String?)
     suspend fun setAppLockEnabled(enabled: Boolean)
+    suspend fun setAppLockPin(pin: String?)
     suspend fun setHapticsEnabled(enabled: Boolean)
     suspend fun setNotificationActions(enabled: Boolean)
     suspend fun setLastCelebratedEpochDay(day: Long)
+    suspend fun setAppIcon(icon: AppIcon)
 }
 
 interface ProfileRepository {
@@ -60,10 +67,13 @@ class SettingsRepositoryImpl @Inject constructor(
     override val defaultReminderMinute by appPreferences::defaultReminderMinute
     override val autoBackupEnabled by appPreferences::autoBackupEnabled
     override val autoBackupFrequencyDays by appPreferences::autoBackupFrequencyDays
+    override val backupFolderUri by appPreferences::backupFolderUri
     override val appLockEnabled by appPreferences::appLockEnabled
+    override val appLockPin by appPreferences::appLockPin
     override val hapticsEnabled by appPreferences::hapticsEnabled
     override val notificationActions by appPreferences::notificationActions
     override val lastCelebratedEpochDay by appPreferences::lastCelebratedEpochDay
+    override val appIcon by appPreferences::appIcon
 
     override suspend fun setThemeMode(mode: ThemeMode) = appPreferences.setThemeMode(mode)
     override suspend fun setUseDynamicColor(enabled: Boolean) = appPreferences.setUseDynamicColor(enabled)
@@ -74,10 +84,13 @@ class SettingsRepositoryImpl @Inject constructor(
     override suspend fun setDefaultReminderMinute(minute: Int) = appPreferences.setDefaultReminderMinute(minute)
     override suspend fun setAutoBackupEnabled(enabled: Boolean) = appPreferences.setAutoBackupEnabled(enabled)
     override suspend fun setAutoBackupFrequencyDays(days: Int) = appPreferences.setAutoBackupFrequencyDays(days)
+    override suspend fun setBackupFolderUri(uri: String?) = appPreferences.setBackupFolderUri(uri)
     override suspend fun setAppLockEnabled(enabled: Boolean) = appPreferences.setAppLockEnabled(enabled)
+    override suspend fun setAppLockPin(pin: String?) = appPreferences.setAppLockPin(pin)
     override suspend fun setHapticsEnabled(enabled: Boolean) = appPreferences.setHapticsEnabled(enabled)
     override suspend fun setNotificationActions(enabled: Boolean) = appPreferences.setNotificationActions(enabled)
     override suspend fun setLastCelebratedEpochDay(day: Long) = appPreferences.setLastCelebratedEpochDay(day)
+    override suspend fun setAppIcon(icon: AppIcon) = appPreferences.setAppIcon(icon)
 
     override fun observeProfile(): Flow<Profile> =
         combine(profilePreferences.name, profilePreferences.photoUri) { name, uri -> Profile(name, uri) }

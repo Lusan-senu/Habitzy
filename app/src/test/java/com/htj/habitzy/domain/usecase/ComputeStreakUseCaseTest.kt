@@ -120,4 +120,72 @@ class ComputeStreakUseCaseTest {
 
         assertThat(result.currentStreak).isEqualTo(4)
     }
+
+    @Test
+    fun `times-per-month counts consecutive target months`() {
+        val today = LocalDate.of(2026, 3, 10)
+        val schedule = HabitSchedule.TimesPerMonth(target = 2)
+        val logs = listOf(
+            log(date = LocalDate.of(2026, 1, 5), completed = true),
+            log(date = LocalDate.of(2026, 1, 20), completed = true),
+            log(date = LocalDate.of(2026, 2, 5), completed = true),
+            log(date = LocalDate.of(2026, 2, 20), completed = true),
+            log(date = LocalDate.of(2026, 3, 2), completed = true),
+            log(date = LocalDate.of(2026, 3, 8), completed = true),
+        )
+
+        val result = useCase.invoke(logs = logs, schedule = schedule, today = today)
+
+        assertThat(result.currentStreak).isEqualTo(3)
+        assertThat(result.bestStreak).isEqualTo(3)
+    }
+
+    @Test
+    fun `times-per-month with unmet target has zero current streak`() {
+        val today = LocalDate.of(2026, 3, 10)
+        val logs = listOf(log(date = LocalDate.of(2026, 3, 2), completed = true))
+
+        val result = useCase.invoke(logs = logs, schedule = HabitSchedule.TimesPerMonth(2), today = today)
+
+        assertThat(result.currentStreak).isEqualTo(0)
+    }
+
+    @Test
+    fun `strength score is full when every expected day completed`() {
+        val today = LocalDate.of(2026, 3, 10)
+        val createdAtEpochDay = today.minusDays(90).toEpochDay()
+        val logs = (0 until 60).map { log(date = today.minusDays(it.toLong()), completed = true) }
+
+        val result = useCase.invoke(
+            logs = logs,
+            schedule = HabitSchedule.Daily,
+            today = today,
+            createdAtEpochDay = createdAtEpochDay,
+        )
+
+        assertThat(result.strengthScore).isEqualTo(100f)
+    }
+
+    @Test
+    fun `strength score is zero when nothing completed`() {
+        val today = LocalDate.of(2026, 3, 10)
+        val logs = (0 until 60).map { log(date = today.minusDays(it.toLong()), completed = false) }
+
+        val result = useCase.invoke(logs = logs, schedule = HabitSchedule.Daily, today = today)
+
+        assertThat(result.strengthScore).isEqualTo(0f)
+    }
+
+    @Test
+    fun `strength score is null when fewer than five expected days`() {
+        val today = LocalDate.of(2026, 3, 10)
+
+        val result = useCase.invoke(
+            logs = emptyList(),
+            schedule = HabitSchedule.EveryNDays(100),
+            today = today,
+        )
+
+        assertThat(result.strengthScore).isNull()
+    }
 }

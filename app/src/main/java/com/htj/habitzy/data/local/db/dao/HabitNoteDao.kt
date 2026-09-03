@@ -11,6 +11,12 @@ interface HabitNoteDao {
     @Insert
     suspend fun insert(note: HabitNoteEntity): Long
 
+    @Query("SELECT * FROM habit_notes ORDER BY habitId ASC, epochDay ASC")
+    suspend fun getAll(): List<HabitNoteEntity>
+
+    @Query("DELETE FROM habit_notes")
+    suspend fun clearAll()
+
     @Query("SELECT * FROM habit_notes WHERE habitId = :habitId ORDER BY epochDay DESC")
     fun observeNotes(habitId: Long): Flow<List<HabitNoteEntity>>
 

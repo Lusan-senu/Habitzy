@@ -122,10 +122,13 @@ data class InsightSummary(
     val overallCompletionRateToday: Float,
     val overallCompletionRateWeek: Float,
     val overallCompletionRateMonth: Float,
+    val overallCompletionRateAllTime: Float,
     val perHabitRanking: List<HabitRankEntry>,
     val hourOfDayHistogram: IntArray,
     val bestCurrentStreaks: List<HabitRankEntry>,
     val weeklyCompletionsTrend: List<Int>,
+    val monthlyHeatmap: List<Float>,
+    val distinctLoggedDays: Int,
 )
 
 data class Profile(

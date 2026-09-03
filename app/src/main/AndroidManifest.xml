@@ -24,9 +24,66 @@
             android:theme="@style/Theme.Habitzy">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <activity-alias
+            android:name=".MainActivityDefault"
+            android:enabled="true"
+            android:exported="true"
+            android:icon="@mipmap/ic_launcher"
+            android:label="@string/app_name"
+            android:roundIcon="@mipmap/ic_launcher_round"
+            android:targetActivity=".MainActivity"
+            android:theme="@style/Theme.Habitzy">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity-alias>
+
+        <activity-alias
+            android:name=".MainActivityMidnight"
+            android:enabled="false"
+            android:exported="false"
+            android:icon="@mipmap/ic_launcher_midnight"
+            android:label="@string/app_name"
+            android:targetActivity=".MainActivity"
+            android:theme="@style/Theme.Habitzy">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity-alias>
+
+        <activity-alias
+            android:name=".MainActivitySunrise"
+            android:enabled="false"
+            android:exported="false"
+            android:icon="@mipmap/ic_launcher_sunrise"
+            android:label="@string/app_name"
+            android:targetActivity=".MainActivity"
+            android:theme="@style/Theme.Habitzy">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity-alias>
+
+        <receiver
+            android:name=".notifications.ReminderReceiver"
+            android:exported="false" />
+        <receiver
+            android:name=".notifications.ReminderActionReceiver"
+            android:exported="false" />
+        <receiver
+            android:name=".notifications.BootCompletedReceiver"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
+            </intent-filter>
+        </receiver>
     </application>
 
 </manifest>

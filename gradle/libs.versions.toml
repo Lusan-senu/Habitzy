@@ -70,6 +70,8 @@ robolectric = { module = "org.robolectric:robolectric", version.ref = "robolectr
 androidx-test-core = { module = "androidx.test:core", version.ref = "androidxTestCore" }
 androidx-room-testing = { module = "androidx.room:room-testing", version.ref = "roomTest" }
 truth = { module = "com.google.truth:truth", version.ref = "truth" }
+androidx-arch-core-testing = { module = "androidx.arch.core:core-testing", version = "2.2.0" }
+turbine = { module = "app.cash.turbine:turbine", version = "1.2.0" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

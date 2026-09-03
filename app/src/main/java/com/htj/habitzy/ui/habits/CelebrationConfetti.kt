@@ -14,14 +14,33 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import com.htj.habitzy.ui.theme.SpaceXXL
 import kotlin.random.Random
+
+@Composable
+private fun isReduceMotionEnabled(): Boolean {
+    val context = LocalContext.current
+    return remember {
+        val value = try {
+            android.provider.Settings.Global.getInt(
+                context.contentResolver,
+                android.provider.Settings.Global.ANIMATOR_DURATION_SCALE,
+                1,
+            )
+        } catch (_: Exception) {
+            1
+        }
+        value == 0
+    }
+}
 
 @Composable
 fun CelebrationConfetti(
     visible: Boolean,
     modifier: Modifier = Modifier,
 ) {
+    val reduceMotion = isReduceMotionEnabled()
     Box(modifier = modifier.fillMaxSize()) {
         if (visible) {
             val palette = listOf(
@@ -33,26 +52,38 @@ fun CelebrationConfetti(
                 com.htj.habitzy.ui.theme.HabitSwatch11,
             )
             val pieces = rememberPieces(count = 40, palette = palette)
-            val transition = rememberInfiniteTransition(label = "confetti")
-            val progress by transition.animateFloat(
-                initialValue = 0f,
-                targetValue = 1f,
-                animationSpec = infiniteRepeatable(
-                    animation = tween(durationMillis = 1400),
-                    repeatMode = RepeatMode.Restart,
-                ),
-                label = "confetti_progress",
-            )
-            Canvas(modifier = Modifier.fillMaxSize()) {
-                pieces.forEach { piece ->
-                    val y = piece.startY * (1f - progress) + piece.endY * progress
-                    val x = piece.startX * (1f - progress) + piece.endX * progress
-                    val sway = kotlin.math.sin((progress * 6.283f) + piece.phase) * piece.swayAmplitude
-                    drawCircle(
-                        color = piece.color,
-                        radius = piece.radius,
-                        center = Offset(x + sway, y),
-                    )
+            if (reduceMotion) {
+                Canvas(modifier = Modifier.fillMaxSize()) {
+                    pieces.forEach { piece ->
+                        drawCircle(
+                            color = piece.color,
+                            radius = piece.radius,
+                            center = Offset(piece.endX + piece.swayAmplitude, piece.endY),
+                        )
+                    }
+                }
+            } else {
+                val transition = rememberInfiniteTransition(label = "confetti")
+                val progress by transition.animateFloat(
+                    initialValue = 0f,
+                    targetValue = 1f,
+                    animationSpec = infiniteRepeatable(
+                        animation = tween(durationMillis = 1400),
+                        repeatMode = RepeatMode.Restart,
+                    ),
+                    label = "confetti_progress",
+                )
+                Canvas(modifier = Modifier.fillMaxSize()) {
+                    pieces.forEach { piece ->
+                        val y = piece.startY * (1f - progress) + piece.endY * progress
+                        val x = piece.startX * (1f - progress) + piece.endX * progress
+                        val sway = kotlin.math.sin((progress * 6.283f) + piece.phase) * piece.swayAmplitude
+                        drawCircle(
+                            color = piece.color,
+                            radius = piece.radius,
+                            center = Offset(x + sway, y),
+                        )
+                    }
                 }
             }
         }

@@ -29,6 +29,12 @@ interface HabitDao {
     @Query("SELECT DISTINCT categoryTag FROM habits WHERE categoryTag IS NOT NULL AND categoryTag != ''")
     suspend fun getUsedCategoryTags(): List<String>
 
+    @Query("SELECT * FROM habits ORDER BY sortOrder ASC")
+    suspend fun getAll(): List<HabitEntity>
+
+    @Query("DELETE FROM habits")
+    suspend fun clearAll()
+
     @Insert suspend fun insert(habit: HabitEntity): Long
 
     @Update suspend fun update(habit: HabitEntity)

@@ -8,10 +8,14 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import com.htj.habitzy.data.local.datastore.AppPreferences
 import com.htj.habitzy.data.local.datastore.ThemeMode
+import com.htj.habitzy.security.AppLockScreen
 import com.htj.habitzy.ui.HabitzyApp
 import com.htj.habitzy.ui.theme.HabitzyDefaultSeed
 import com.htj.habitzy.ui.theme.HabitzyTheme
@@ -54,6 +58,28 @@ private fun HabitzyRootTheme(appPreferences: AppPreferences) {
         seedColor = Color(accentSeed),
         trueBlack = useTrueBlack,
     ) {
-        HabitzyApp()
+        AppLockGate(appPreferences) {
+            HabitzyApp()
+        }
+    }
+}
+
+@Composable
+private fun AppLockGate(
+    appPreferences: AppPreferences,
+    content: @Composable () -> Unit,
+) {
+    val enabled by appPreferences.appLockEnabled.collectAsState(initial = false)
+    val pinHash by appPreferences.appLockPin.collectAsState(initial = null)
+    var unlocked by remember { mutableStateOf(!enabled) }
+
+    val storedHash = pinHash
+    if (enabled && storedHash != null && !unlocked) {
+        AppLockScreen(
+            storedPinHash = storedHash,
+            onUnlocked = { unlocked = true },
+        )
+    } else {
+        content()
     }
 }

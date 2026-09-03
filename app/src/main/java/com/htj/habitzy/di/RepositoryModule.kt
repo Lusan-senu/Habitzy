@@ -1,7 +1,9 @@
 package com.htj.habitzy.di
 
+import com.htj.habitzy.data.repository.BackupRepositoryImpl
 import com.htj.habitzy.data.repository.HabitRepositoryImpl
 import com.htj.habitzy.data.repository.InsightsRepositoryImpl
+import com.htj.habitzy.domain.repository.BackupRepository
 import com.htj.habitzy.domain.repository.HabitRepository
 import com.htj.habitzy.domain.repository.InsightsRepository
 import com.htj.habitzy.domain.repository.ProfileRepository
@@ -32,4 +34,8 @@ abstract class RepositoryModule {
     @Binds
     @Singleton
     abstract fun bindProfileRepository(impl: SettingsRepositoryImpl): ProfileRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindBackupRepository(impl: BackupRepositoryImpl): BackupRepository
 }

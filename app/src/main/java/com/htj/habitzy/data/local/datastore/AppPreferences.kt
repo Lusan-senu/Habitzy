@@ -20,6 +20,12 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 enum class ThemeMode { SYSTEM, LIGHT, DARK }
 
+enum class AppIcon(val componentSuffix: String) {
+    DEFAULT("MainActivityDefault"),
+    MIDNIGHT("MainActivityMidnight"),
+    SUNRISE("MainActivitySunrise"),
+}
+
 private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "habitzy_settings")
 
 @Singleton
@@ -36,10 +42,13 @@ class AppPreferences @Inject constructor(
         val DEFAULT_REMINDER_MINUTE = intPreferencesKey("default_reminder_minute")
         val AUTO_BACKUP_ENABLED = booleanPreferencesKey("auto_backup_enabled")
         val AUTO_BACKUP_FREQUENCY_DAYS = intPreferencesKey("auto_backup_frequency_days")
+        val BACKUP_FOLDER_URI = stringPreferencesKey("backup_folder_uri")
         val APP_LOCK_ENABLED = booleanPreferencesKey("app_lock_enabled")
+        val APP_LOCK_PIN = stringPreferencesKey("app_lock_pin")
         val HAPTICS_ENABLED = booleanPreferencesKey("haptics_enabled")
         val LAST_CELEBRATED_EPOCH_DAY = longPreferencesKey("last_celebrated_epoch_day")
         val NOTIFICATION_ACTIONS = booleanPreferencesKey("notification_actions")
+        val APP_ICON = stringPreferencesKey("app_icon")
     }
 
     val themeMode: Flow<ThemeMode> = context.dataStore.data.map {
@@ -75,8 +84,18 @@ class AppPreferences @Inject constructor(
     val autoBackupFrequencyDays: Flow<Int> = context.dataStore.data.map { it[Keys.AUTO_BACKUP_FREQUENCY_DAYS] ?: 7 }
     suspend fun setAutoBackupFrequencyDays(days: Int) = edit { it[Keys.AUTO_BACKUP_FREQUENCY_DAYS] = days }
 
+    val backupFolderUri: Flow<String?> = context.dataStore.data.map { it[Keys.BACKUP_FOLDER_URI] }
+    suspend fun setBackupFolderUri(uri: String?) = edit {
+        if (uri == null) it.remove(Keys.BACKUP_FOLDER_URI) else it[Keys.BACKUP_FOLDER_URI] = uri
+    }
+
     val appLockEnabled: Flow<Boolean> = context.dataStore.data.map { it[Keys.APP_LOCK_ENABLED] ?: false }
     suspend fun setAppLockEnabled(enabled: Boolean) = edit { it[Keys.APP_LOCK_ENABLED] = enabled }
+
+    val appLockPin: Flow<String?> = context.dataStore.data.map { it[Keys.APP_LOCK_PIN] }
+    suspend fun setAppLockPin(pin: String?) = edit {
+        if (pin == null) it.remove(Keys.APP_LOCK_PIN) else it[Keys.APP_LOCK_PIN] = pin
+    }
 
     val hapticsEnabled: Flow<Boolean> = context.dataStore.data.map { it[Keys.HAPTICS_ENABLED] ?: true }
     suspend fun setHapticsEnabled(enabled: Boolean) = edit { it[Keys.HAPTICS_ENABLED] = enabled }
@@ -86,6 +105,12 @@ class AppPreferences @Inject constructor(
 
     val notificationActions: Flow<Boolean> = context.dataStore.data.map { it[Keys.NOTIFICATION_ACTIONS] ?: true }
     suspend fun setNotificationActions(enabled: Boolean) = edit { it[Keys.NOTIFICATION_ACTIONS] = enabled }
+
+    val appIcon: Flow<AppIcon> = context.dataStore.data.map {
+        runCatching { AppIcon.valueOf(it[Keys.APP_ICON] ?: AppIcon.DEFAULT.name) }
+            .getOrDefault(AppIcon.DEFAULT)
+    }
+    suspend fun setAppIcon(icon: AppIcon) = edit { it[Keys.APP_ICON] = icon.name }
 
     private suspend fun edit(block: (MutablePreferences) -> Unit) {
         context.dataStore.edit(block)

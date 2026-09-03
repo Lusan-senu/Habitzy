@@ -18,6 +18,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -33,6 +34,19 @@ fun StreakBadge(
     streak: Int,
     modifier: Modifier = Modifier,
 ) {
+    val context = LocalContext.current
+    val reduceMotion = remember {
+        val value = try {
+            android.provider.Settings.Global.getInt(
+                context.contentResolver,
+                android.provider.Settings.Global.ANIMATOR_DURATION_SCALE,
+                1,
+            )
+        } catch (_: Exception) {
+            1
+        }
+        value == 0
+    }
     var prevStreak by remember { mutableIntStateOf(streak) }
     var bounce by remember { mutableIntStateOf(0) }
 
@@ -44,7 +58,7 @@ fun StreakBadge(
     }
 
     val scale by animateFloatAsState(
-        targetValue = if (bounce > 0) 1.2f else 1f,
+        targetValue = if (bounce > 0 && !reduceMotion) 1.2f else 1f,
         animationSpec = HabitzyMotion.celebrationSpring as SpringSpec<Float>,
         finishedListener = { /* reset handled by next LaunchedEffect */ },
         label = "streak_bounce",

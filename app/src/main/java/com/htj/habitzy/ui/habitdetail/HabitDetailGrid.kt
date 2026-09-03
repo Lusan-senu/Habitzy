@@ -17,15 +17,20 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.htj.habitzy.ui.components.ActivityGrid
 import com.htj.habitzy.ui.theme.HabitzyShapes
 import com.htj.habitzy.ui.theme.ShapeFull
 import com.htj.habitzy.ui.theme.SpaceS
+import com.htj.habitzy.ui.theme.SpaceXXS
 import com.htj.habitzy.ui.theme.SpaceXS
+import com.htj.habitzy.ui.theme.SpaceXXS
 import java.time.DayOfWeek
 import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 import java.time.format.TextStyle
 import java.util.Locale
 
@@ -85,7 +90,7 @@ private fun WeekGrid(
     Column(modifier = modifier.fillMaxWidth()) {
         Row(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(2.dp),
+            horizontalArrangement = Arrangement.spacedBy(SpaceXXS),
         ) {
             (0..6).forEach { offset ->
                 val date = start.plusDays(offset.toLong())
@@ -103,7 +108,7 @@ private fun WeekGrid(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(top = SpaceXS),
-            horizontalArrangement = Arrangement.spacedBy(2.dp),
+            horizontalArrangement = Arrangement.spacedBy(SpaceXXS),
         ) {
             (0..6).forEach { offset ->
                 val date = start.plusDays(offset.toLong())
@@ -140,7 +145,7 @@ private fun MonthGrid(
     Column(modifier = modifier.fillMaxWidth()) {
         Row(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(2.dp),
+            horizontalArrangement = Arrangement.spacedBy(SpaceXXS),
         ) {
             (0..6).forEach { offset ->
                 val d = weekStartDay.plus(offset.toLong())
@@ -155,12 +160,12 @@ private fun MonthGrid(
         }
         Column(
             modifier = Modifier.padding(top = SpaceXS),
-            verticalArrangement = Arrangement.spacedBy(2.dp),
+            verticalArrangement = Arrangement.spacedBy(SpaceXXS),
         ) {
             weeks.forEach { week ->
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(2.dp),
+                    horizontalArrangement = Arrangement.spacedBy(SpaceXXS),
                 ) {
                     week.forEach { date ->
                         if (date.month == today.month) {
@@ -201,6 +206,22 @@ private fun rememberWeeks(
     return result
 }
 
+/** TalkBack label for a detail-grid day cell (§13.2), including the vacation state. */
+private fun detailDayContentDescription(
+    date: LocalDate,
+    isCompleted: Boolean,
+    isVacation: Boolean,
+    isFuture: Boolean,
+): String {
+    val formatted = date.format(DateTimeFormatter.ofPattern("EEEE, MMMM d", Locale.getDefault()))
+    return when {
+        isFuture -> "$formatted — upcoming"
+        isVacation -> "$formatted — vacation, not counted"
+        isCompleted -> "$formatted — completed"
+        else -> "$formatted — not completed"
+    }
+}
+
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun DayCell(
@@ -230,6 +251,14 @@ private fun DayCell(
             .aspectRatio(1f)
             .clip(HabitzyShapes.extraSmall)
             .background(color)
+            .semantics {
+                contentDescription = detailDayContentDescription(
+                    date = date,
+                    isCompleted = isCompleted,
+                    isVacation = isVacation,
+                    isFuture = isFuture,
+                )
+            }
             .combinedClickable(
                 onClick = { if (!isFuture) onDayClick(date) },
                 onLongClick = { onDayLongPress(date) },

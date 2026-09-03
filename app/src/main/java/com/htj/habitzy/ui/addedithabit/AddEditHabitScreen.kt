@@ -100,8 +100,10 @@ fun AddEditHabitScreen(
     var editingReminderIndex by remember { mutableIntStateOf(-1) }
 
     val nameFocusRequester = remember { FocusRequester() }
-    LaunchedEffect(Unit) {
-        if (habitId == null) nameFocusRequester.requestFocus()
+    LaunchedEffect(uiState.isLoading, habitId) {
+        if (habitId == null && !uiState.isLoading) {
+            nameFocusRequester.requestFocus()
+        }
     }
 
     LaunchedEffect(Unit) {

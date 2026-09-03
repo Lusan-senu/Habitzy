@@ -28,6 +28,7 @@ class ComputeInsightsUseCase @Inject constructor() {
     ): InsightSummary {
         val habitById = habits.associateBy { it.id }
         val validLogs = logs.filter { it.habitId in habitById }
+        val distinctLoggedDays = validLogs.map { it.date }.distinct().size
 
         val overallToday = completionRate(validLogs, habits, today..today)
         val weekRange = rangeForWeek(today, weekStart)
@@ -40,7 +41,7 @@ class ComputeInsightsUseCase @Inject constructor() {
                 InsightPeriod.TODAY -> today..today
                 InsightPeriod.WEEK -> weekRange
                 InsightPeriod.MONTH -> monthRange
-                InsightPeriod.ALL_TIME -> LocalDate.MIN..today
+                InsightPeriod.ALL_TIME -> allTimeRange(validLogs, habits, today)
             }
             val rate = completionRateForHabit(validLogs, habit, range)
             HabitRankEntry(habit.id, habit.name, habit.icon, habit.color, rate)
@@ -75,14 +76,30 @@ class ComputeInsightsUseCase @Inject constructor() {
             trend.add(validLogs.count { it.date in weekStartDate..weekEnd && it.isCompleted })
         }
 
+        val heatmap = (1..today.lengthOfMonth()).map { day ->
+            val date = today.withDayOfMonth(day)
+            var expected = 0
+            var done = 0
+            habits.forEach { habit ->
+                if (isScheduled(habit, date)) {
+                    expected++
+                    if (validLogs.any { it.habitId == habit.id && it.date == date && it.isCompleted }) done++
+                }
+            }
+            if (expected == 0) 0f else done.toFloat() / expected
+        }
+
         return InsightSummary(
             overallCompletionRateToday = overallToday,
             overallCompletionRateWeek = overallWeek,
             overallCompletionRateMonth = overallMonth,
+            overallCompletionRateAllTime = overallMonth,
             perHabitRanking = ranking,
             hourOfDayHistogram = histogram,
             bestCurrentStreaks = bestCurrentStreaks,
             weeklyCompletionsTrend = trend,
+            monthlyHeatmap = heatmap,
+            distinctLoggedDays = distinctLoggedDays,
         )
     }
 
@@ -90,6 +107,17 @@ class ComputeInsightsUseCase @Inject constructor() {
         var start = date.minusDays((date.dayOfWeek.value - weekStart.value).toLong())
         if (start.isAfter(date)) start = start.minusDays(7)
         return start..start.plusDays(6)
+    }
+
+    private fun allTimeRange(
+        logs: List<HabitLog>,
+        habits: List<Habit>,
+        today: LocalDate,
+    ): ClosedRange<LocalDate> {
+        var start = today.toEpochDay()
+        logs.forEach { if (it.date.toEpochDay() < start) start = it.date.toEpochDay() }
+        habits.forEach { if (it.createdAtEpochDay < start) start = it.createdAtEpochDay }
+        return LocalDate.ofEpochDay(start)..today
     }
 
     private fun completionRate(logs: List<HabitLog>, habits: List<Habit>, range: ClosedRange<LocalDate>): Float {

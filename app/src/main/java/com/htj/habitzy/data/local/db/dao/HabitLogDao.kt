@@ -23,6 +23,12 @@ interface HabitLogDao {
     @Query("SELECT * FROM habit_logs WHERE habitId = :habitId ORDER BY epochDay ASC")
     suspend fun getAllLogs(habitId: Long): List<HabitLogEntity>
 
+    @Query("SELECT * FROM habit_logs ORDER BY habitId ASC, epochDay ASC")
+    suspend fun getAll(): List<HabitLogEntity>
+
+    @Query("DELETE FROM habit_logs")
+    suspend fun clearAll()
+
     @Query("DELETE FROM habit_logs WHERE habitId = :habitId AND epochDay = :day")
     suspend fun deleteLog(habitId: Long, day: Long)
 }

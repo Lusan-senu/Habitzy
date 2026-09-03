@@ -18,6 +18,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import com.htj.habitzy.ui.theme.HabitzyShapes
 import com.htj.habitzy.ui.theme.ShapeFull
@@ -26,6 +28,7 @@ import com.htj.habitzy.ui.theme.SpaceS
 import com.htj.habitzy.ui.theme.SpaceXS
 import java.time.DayOfWeek
 import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 import java.time.format.TextStyle
 import java.util.Locale
 
@@ -107,6 +110,13 @@ fun ActivityGrid(
                                 .aspectRatio(1f)
                                 .clip(HabitzyShapes.extraSmall)
                                 .background(cellColor)
+                                .semantics {
+                                    contentDescription = dayContentDescription(
+                                        date = date,
+                                        intensity = intensity,
+                                        isFuture = isFuture,
+                                    )
+                                }
                                 .then(
                                     if (!isFuture && onDayClick != null) {
                                         Modifier.clickable { onDayClick(date) }
@@ -138,6 +148,21 @@ private fun intensityToColor(intensity: Float): Color {
     val primary = MaterialTheme.colorScheme.primary
     val containerLowest = MaterialTheme.colorScheme.surfaceContainerLowest
     return lerpColor(containerLowest, primary, intensity.coerceIn(0f, 1f))
+}
+
+/** TalkBack label for a color-coded grid cell (§13.2): date + completion state. */
+private fun dayContentDescription(
+    date: LocalDate,
+    intensity: Float,
+    isFuture: Boolean,
+): String {
+    val formatted = date.format(DateTimeFormatter.ofPattern("EEEE, MMMM d, yyyy", Locale.getDefault()))
+    return when {
+        isFuture -> "$formatted — upcoming"
+        intensity >= 0.999f -> "$formatted — completed"
+        intensity > 0f -> "$formatted — ${(intensity * 100).toInt()} percent complete"
+        else -> "$formatted — not completed"
+    }
 }
 
 private fun lerpColor(from: Color, to: Color, fraction: Float): Color {

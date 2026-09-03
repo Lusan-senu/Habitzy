@@ -9,6 +9,8 @@ import com.htj.habitzy.domain.model.HabitSchedule
 import com.htj.habitzy.domain.model.HabitType
 import com.htj.habitzy.domain.model.Reminder
 import com.htj.habitzy.domain.repository.HabitRepository
+import com.htj.habitzy.domain.repository.SettingsRepository
+import com.htj.habitzy.notifications.NotificationScheduler
 import dagger.hilt.android.lifecycle.HiltViewModel
 import java.time.DayOfWeek
 import java.time.LocalDate
@@ -26,6 +28,8 @@ import kotlinx.coroutines.launch
 class AddEditHabitViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val habitRepository: HabitRepository,
+    private val notificationScheduler: NotificationScheduler,
+    private val settingsRepository: SettingsRepository,
 ) : ViewModel() {
 
     private val habitId: Long? = savedStateHandle.get<Long>("habitId")
@@ -35,11 +39,16 @@ class AddEditHabitViewModel @Inject constructor(
 
     private var existingHabit: Habit? = null
 
+    private var defaultReminderHour = 9
+    private var defaultReminderMinute = 0
+
     private val _saved = Channel<Boolean>(Channel.BUFFERED)
     val saved = _saved.receiveAsFlow()
 
     init {
         viewModelScope.launch {
+            defaultReminderHour = settingsRepository.defaultReminderHour.first()
+            defaultReminderMinute = settingsRepository.defaultReminderMinute.first()
             val tags = habitRepository.getUsedCategoryTags()
             if (habitId == null) {
                 _uiState.value = AddEditHabitUiState(isLoading = false, usedCategoryTags = tags)
@@ -134,7 +143,7 @@ class AddEditHabitViewModel @Inject constructor(
 
     fun addReminder() = update {
         val id = (it.reminders.maxOfOrNull { r -> r.id } ?: 0L) + 1
-        it.copy(reminders = it.reminders + ReminderDraft(id = id, hour = 9, minute = 0, message = "", enabled = true))
+        it.copy(reminders = it.reminders + ReminderDraft(id = id, hour = defaultReminderHour, minute = defaultReminderMinute, message = "", enabled = true))
     }
     fun updateReminder(index: Int, reminder: ReminderDraft) = update {
         it.copy(reminders = it.reminders.toMutableList().also { l -> l[index] = reminder })
@@ -188,6 +197,7 @@ class AddEditHabitViewModel @Inject constructor(
                 Reminder(id = it.id, habitId = id, hour = it.hour, minute = it.minute, message = it.message.ifBlank { null }, isEnabled = it.enabled)
             }
             habitRepository.saveReminders(id, reminders)
+            notificationScheduler.rescheduleAll()
             _saved.send(existing != null)
         }
     }

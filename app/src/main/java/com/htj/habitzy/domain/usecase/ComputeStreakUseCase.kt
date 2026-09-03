@@ -182,7 +182,11 @@ class ComputeStreakUseCase @Inject constructor() {
         val expectedDays = mutableListOf<LocalDate>()
         var day = today
         var safety = 0
-        while (expectedDays.size < 60 && safety < 2000) {
+        // Expected days only exist from the habit's creation (or its earliest logged day,
+        // which proves the habit existed then) onward — a habit younger than 5 expected
+        // days shows "Not enough data" instead of a misleading low score.
+        val earliestEvidence = minOf(createdAtEpochDay, logByDay.keys.minOrNull() ?: createdAtEpochDay)
+        while (expectedDays.size < 60 && safety < 2000 && day.toEpochDay() >= earliestEvidence) {
             safety++
             if (onVacation(day, vacationRange)) {
                 day = day.minusDays(1)

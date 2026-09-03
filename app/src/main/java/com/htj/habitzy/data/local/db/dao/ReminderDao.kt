@@ -25,6 +25,12 @@ interface ReminderDao {
     @Query("SELECT * FROM reminders WHERE habitId = :habitId")
     suspend fun getRemindersForHabit(habitId: Long): List<ReminderEntity>
 
+    @Query("SELECT * FROM reminders")
+    suspend fun getAll(): List<ReminderEntity>
+
+    @Query("DELETE FROM reminders")
+    suspend fun clearAll()
+
     @Query("DELETE FROM reminders WHERE id = :id")
     suspend fun deleteById(id: Long)
 

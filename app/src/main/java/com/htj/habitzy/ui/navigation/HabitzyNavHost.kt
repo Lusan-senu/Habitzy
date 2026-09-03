@@ -92,7 +92,10 @@ fun HabitzyNavHost(
         }
 
         composable<AccountSettingsRoute> {
-            AccountSettingsScreen(onBack = { navController.popBackStack() })
+            AccountSettingsScreen(
+                onBack = { navController.popBackStack() },
+                onProfileClick = { navController.navigate(ProfileRoute) },
+            )
         }
         composable<AppearanceSettingsRoute> {
             AppearanceSettingsScreen(onBack = { navController.popBackStack() })
