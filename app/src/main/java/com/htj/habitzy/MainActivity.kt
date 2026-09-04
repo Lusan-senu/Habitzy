@@ -37,6 +37,7 @@ class MainActivity : ComponentActivity() {
     }
 }
 
+@OptIn(androidx.compose.material3.ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 private fun HabitzyRootTheme(appPreferences: AppPreferences) {
     val systemDark = isSystemInDarkTheme()

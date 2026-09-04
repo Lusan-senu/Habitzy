@@ -26,6 +26,7 @@ robolectric = "4.14.1"
 truth = "1.4.4"
 roomTest = "2.7.0"
 androidxTestCore = "1.6.1"
+graphicsShapes = "1.1.0"
 
 [libraries]
 androidx-core-ktx = { module = "androidx.core:core-ktx", version.ref = "coreKtx" }
@@ -74,6 +75,8 @@ androidx-room-testing = { module = "androidx.room:room-testing", version.ref = "
 truth = { module = "com.google.truth:truth", version.ref = "truth" }
 androidx-arch-core-testing = { module = "androidx.arch.core:core-testing", version = "2.2.0" }
 turbine = { module = "app.cash.turbine:turbine", version = "1.2.0" }
+androidx-ui-text-google-fonts = { module = "androidx.compose.ui:ui-text-google-fonts" }
+androidx-graphics-shapes = { module = "androidx.graphics:graphics-shapes", version.ref = "graphicsShapes" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

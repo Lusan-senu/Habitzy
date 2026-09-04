@@ -1,5 +1,8 @@
 package com.htj.habitzy.ui.components
 
+import HabitzyDecorativeShapes
+import HabitzyShapes
+import ShapeFull
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.background
@@ -10,7 +13,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.Icon
@@ -19,6 +21,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -26,14 +29,15 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.graphics.shapes.Morph
 import com.htj.habitzy.domain.model.Habit
 import com.htj.habitzy.domain.model.HabitIcon
 import com.htj.habitzy.domain.model.HabitType
 import com.htj.habitzy.ui.theme.HabitzyElevation
-import com.htj.habitzy.ui.theme.HabitzyShapes
-import com.htj.habitzy.ui.theme.ShapeFull
-import com.htj.habitzy.ui.theme.SpaceM
+import com.htj.habitzy.ui.theme.HabitzyMotion
+import com.htj.habitzy.ui.theme.MorphPolygonShape
 import com.htj.habitzy.ui.theme.SpaceL
+import com.htj.habitzy.ui.theme.SpaceM
 import com.htj.habitzy.ui.theme.SpaceS
 
 data class HabitWithTodayLog(
@@ -147,6 +151,14 @@ fun HabitCompletionControl(
 ) {
     when (habit.type) {
         is HabitType.Binary -> {
+            val checkMorph = remember {
+                Morph(HabitzyDecorativeShapes.CirclePolygon, HabitzyDecorativeShapes.SunnyPolygon)
+            }
+            val morphProgress by animateFloatAsState(
+                targetValue = if (isCompleted) 1f else 0f,
+                animationSpec = HabitzyMotion.celebrationSpring,
+                label = "check_shape_morph",
+            )
             val scale by animateFloatAsState(
                 targetValue = if (isCompleted) 1f else 0.8f,
                 label = "check_scale",
@@ -166,7 +178,7 @@ fun HabitCompletionControl(
                         scaleX = scale
                         scaleY = scale
                     }
-                    .clip(CircleShape)
+                    .clip(MorphPolygonShape(checkMorph, morphProgress))
                     .background(bgColor)
                     .clickable(onClick = onToggle),
                 contentAlignment = Alignment.Center,

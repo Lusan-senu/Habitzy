@@ -60,7 +60,6 @@ import com.htj.habitzy.ui.components.HabitzyTopActionPill
 import com.htj.habitzy.ui.components.SectionHeader
 import com.htj.habitzy.ui.components.StreakBadge
 import com.htj.habitzy.ui.navigation.FloatingNavClusterContentClearance
-import com.htj.habitzy.ui.theme.DisplayMediumEmphasized
 import com.htj.habitzy.ui.theme.HabitzyShapes
 import com.htj.habitzy.ui.theme.SpaceL
 import com.htj.habitzy.ui.theme.SpaceM
@@ -207,7 +206,7 @@ private fun OverviewCard(
         ) {
             Text(
                 text = "${(rate * 100).roundToInt()}%",
-                style = DisplayMediumEmphasized,
+                style = MaterialTheme.typography.displayMediumEmphasized,
                 color = MaterialTheme.colorScheme.onPrimaryContainer,
                 textAlign = TextAlign.Center,
             )

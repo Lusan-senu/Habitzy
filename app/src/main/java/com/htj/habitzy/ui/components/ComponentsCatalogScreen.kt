@@ -410,11 +410,11 @@ fun ComponentsCatalogScreen(
 
             // Section: Emphasized typography
             CatalogSection("Emphasized typography") {
-                Text("Display Large Emphasized", style = com.htj.habitzy.ui.theme.DisplayLargeEmphasized)
-                Text("Display Medium Emphasized", style = com.htj.habitzy.ui.theme.DisplayMediumEmphasized)
-                Text("Display Small Emphasized", style = com.htj.habitzy.ui.theme.DisplaySmallEmphasized)
-                Text("Headline Large Emphasized", style = com.htj.habitzy.ui.theme.HeadlineLargeEmphasized)
-                Text("Headline Medium Emphasized", style = com.htj.habitzy.ui.theme.HeadlineMediumEmphasized)
+                Text("Display Large Emphasized", style = MaterialTheme.typography.displayLargeEmphasized)
+                Text("Display Medium Emphasized", style = MaterialTheme.typography.displayMediumEmphasized)
+                Text("Display Small Emphasized", style = MaterialTheme.typography.displaySmallEmphasized)
+                Text("Headline Large Emphasized", style = MaterialTheme.typography.headlineLargeEmphasized)
+                Text("Headline Medium Emphasized", style = MaterialTheme.typography.headlineMediumEmphasized)
             }
 
             // Snackbar demo

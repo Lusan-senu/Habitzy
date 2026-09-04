@@ -105,6 +105,7 @@ fun HabitzyTopActionPill(
     }
 }
 
+@OptIn(androidx.compose.material3.ExperimentalMaterial3ExpressiveApi::class)
 @Preview(name = "Pill — light")
 @Composable
 private fun HabitzyTopActionPillPreviewLight() {
@@ -117,6 +118,7 @@ private fun HabitzyTopActionPillPreviewLight() {
     }
 }
 
+@OptIn(androidx.compose.material3.ExperimentalMaterial3ExpressiveApi::class)
 @Preview(name = "Pill — dark", uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
 private fun HabitzyTopActionPillPreviewDark() {

@@ -1,5 +1,6 @@
 package com.htj.habitzy.ui.navigation
 
+import ShapeFull
 import androidx.annotation.DrawableRes
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateColorAsState
@@ -46,8 +47,13 @@ import com.htj.habitzy.R
 import com.htj.habitzy.ui.theme.HabitzyElevation
 import com.htj.habitzy.ui.theme.HabitzyMotion
 import com.htj.habitzy.ui.theme.HabitzyTheme
-import com.htj.habitzy.ui.theme.ShapeFull
-
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsPressedAsState
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.graphics.shapes.Morph
+import com.htj.habitzy.ui.theme.MorphPolygonShape
 enum class HabitzyTopLevelTab { Habits, Insights }
 
 /** Bottom content clearance so list items aren't hidden behind the floating cluster. */
@@ -62,22 +68,13 @@ fun HabitzyFloatingNavCluster(
     visible: Boolean,
     modifier: Modifier = Modifier,
 ) {
+    val spatialSpec = HabitzyMotion.defaultSpatialSpec<IntOffset>()
+    val effectsSpec = HabitzyMotion.defaultEffectsSpec<Float>()
+
     AnimatedVisibility(
         visible = visible,
-        enter = fadeIn(HabitzyMotion.standardSpring) +
-            slideInVertically(
-                spring<IntOffset>(
-                    dampingRatio = 1f,
-                    stiffness = 300f,
-                ),
-            ) { it / 2 },
-        exit = fadeOut(HabitzyMotion.standardSpring) +
-            slideOutVertically(
-                spring<IntOffset>(
-                    dampingRatio = 1f,
-                    stiffness = 300f,
-                ),
-            ) { it / 2 },
+        enter = fadeIn(effectsSpec) + slideInVertically(spatialSpec) { it / 2 },
+        exit = fadeOut(effectsSpec) + slideOutVertically(spatialSpec) { it / 2 },
         modifier = modifier,
     ) {
         Row(
@@ -93,9 +90,21 @@ fun HabitzyFloatingNavCluster(
                 onSelectHabits = onSelectHabits,
                 onSelectInsights = onSelectInsights,
             )
+            val fabInteractionSource = remember { MutableInteractionSource() }
+            val isFabPressed by fabInteractionSource.collectIsPressedAsState()
+            val fabMorph = remember {
+                Morph(HabitzyDecorativeShapes.CirclePolygon, HabitzyDecorativeShapes.SquarePolygon)
+            }
+            val fabMorphProgress by animateFloatAsState(
+                targetValue = if (isFabPressed) 1f else 0f,
+                animationSpec = HabitzyMotion.fastSpatialSpec(),
+                label = "fab_press_morph",
+            )
+
             FloatingActionButton(
                 onClick = onAddHabit,
-                shape = ShapeFull,
+                interactionSource = fabInteractionSource,
+                shape = MorphPolygonShape(fabMorph, fabMorphProgress),
                 containerColor = MaterialTheme.colorScheme.primary,
                 contentColor = MaterialTheme.colorScheme.onPrimary,
                 modifier = Modifier.size(56.dp),
@@ -151,10 +160,7 @@ private fun HabitzyToggleItem(
     val backgroundColor by animateColorAsState(
         targetValue = if (selected) MaterialTheme.colorScheme.secondaryContainer
         else Color.Transparent,
-        animationSpec = spring<Color>(
-            dampingRatio = 0.6f,
-            stiffness = 380f,
-        ),
+        animationSpec = HabitzyMotion.defaultEffectsSpec(),
         label = "toggleItemBackground",
     )
     val contentColor = if (selected) MaterialTheme.colorScheme.onSecondaryContainer

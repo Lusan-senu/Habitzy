@@ -30,6 +30,7 @@ import com.htj.habitzy.ui.theme.HabitSwatch8
 import com.htj.habitzy.ui.theme.HabitSwatch9
 import com.htj.habitzy.ui.theme.ShapeFull
 import com.htj.habitzy.ui.theme.SpaceS
+import androidx.compose.ui.graphics.luminance
 
 val HabitSwatches = listOf(
     HabitSwatch1, HabitSwatch2, HabitSwatch3, HabitSwatch4,
@@ -67,9 +68,10 @@ fun ColorSwatchPicker(
                 contentAlignment = Alignment.Center,
             ) {
                 if (isSelected) {
+                    val checkmarkColor = if (swatch.luminance() > 0.5f) Color.Black else Color.White
                     Text(
                         text = "✓",
-                        color = Color.White,
+                        color = checkmarkColor,
                         style = MaterialTheme.typography.labelSmall,
                     )
                 }

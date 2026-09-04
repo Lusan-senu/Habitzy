@@ -135,4 +135,9 @@ dependencies {
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
+
+    implementation(libs.androidx.ui.text.google.fonts)
+
+    // Shape morphing (Phase 4 — M3 Expressive shape library)
+    implementation(libs.androidx.graphics.shapes)
 }

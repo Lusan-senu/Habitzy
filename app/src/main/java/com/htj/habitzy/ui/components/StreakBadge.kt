@@ -1,5 +1,6 @@
 package com.htj.habitzy.ui.components
 
+import ShapeFull
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -25,10 +26,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.animation.core.SpringSpec
 import com.htj.habitzy.R
 import com.htj.habitzy.ui.theme.HabitzyMotion
-import com.htj.habitzy.ui.theme.ShapeFull
 import com.htj.habitzy.ui.theme.SpaceS
 import com.htj.habitzy.ui.theme.SpaceXS
-
+import com.htj.habitzy.ui.theme.SpaceM
+import com.htj.habitzy.ui.theme.asComposeShape
 @Composable
 fun StreakBadge(
     streak: Int,
@@ -47,6 +48,12 @@ fun StreakBadge(
         }
         value == 0
     }
+
+    val milestonePolygon = remember(streak) { HabitzyDecorativeShapes.forStreakMilestone(streak) }
+    val badgeShape = remember(milestonePolygon) {
+        milestonePolygon?.asComposeShape() ?: ShapeFull
+    }
+
     var prevStreak by remember { mutableIntStateOf(streak) }
     var bounce by remember { mutableIntStateOf(0) }
 
@@ -69,9 +76,12 @@ fun StreakBadge(
             .scale(scale)
             .background(
                 color = MaterialTheme.colorScheme.primaryContainer,
-                shape = ShapeFull,
+                shape = badgeShape,
             )
-            .padding(horizontal = SpaceS, vertical = SpaceXS),
+            .padding(
+                horizontal = if (milestonePolygon != null) SpaceM else SpaceS,
+                vertical = SpaceXS,
+            ),
         horizontalArrangement = Arrangement.spacedBy(SpaceXS),
         verticalAlignment = Alignment.CenterVertically,
     ) {
