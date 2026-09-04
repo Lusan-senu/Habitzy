@@ -18,7 +18,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.rounded.Favorite
-import androidx.compose.material.icons.rounded.Settings
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.ElevatedCard
@@ -140,12 +139,14 @@ fun ComponentsCatalogScreen(
                 style = MaterialTheme.typography.headlineMedium,
             )
 
-            // Section: HabitzyTopBar (large)
+            // Section: HabitzyTopBar (large) with the top action pill
             CatalogSection("HabitzyTopBar (large)") {
                 HabitzyTopBar(title = "Habits", large = true, actions = {
-                    Icon(
-                        imageVector = Icons.Rounded.Settings,
-                        contentDescription = "Settings",
+                    HabitzyTopActionPill(
+                        onProfileClick = {},
+                        onSettingsClick = {},
+                        filterSortAvailable = true,
+                        onFilterSortClick = {},
                     )
                 })
             }

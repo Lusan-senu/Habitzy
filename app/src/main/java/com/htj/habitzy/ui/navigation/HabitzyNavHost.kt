@@ -17,35 +17,36 @@ import com.htj.habitzy.ui.settings.account.AccountSettingsScreen
 import com.htj.habitzy.ui.settings.appearance.AppearanceSettingsScreen
 import com.htj.habitzy.ui.settings.data.DataSettingsScreen
 import com.htj.habitzy.ui.settings.preferences.PreferencesSettingsScreen
-import com.htj.habitzy.ui.theme.sharedAxisXIn
-import com.htj.habitzy.ui.theme.sharedAxisXOut
-import com.htj.habitzy.ui.theme.slideFromEndIn
-import com.htj.habitzy.ui.theme.slideToEndOut
+import com.htj.habitzy.ui.theme.materialSharedAxisXIn
+import com.htj.habitzy.ui.theme.materialSharedAxisXOut
+import com.htj.habitzy.ui.theme.materialSlideFromEndIn
+import com.htj.habitzy.ui.theme.materialSlideToEndOut
 
 @Composable
 fun HabitzyNavHost(
     navController: NavHostController,
     modifier: Modifier = Modifier,
 ) {
-    NavHost(
-        navController = navController,
-        startDestination = HabitsRoute,
-        modifier = modifier,
-        enterTransition = { slideFromEndIn() },
-        exitTransition = { slideToEndOut() },
-        popEnterTransition = { slideFromEndIn() },
-        popExitTransition = { slideToEndOut() },
-    ) {
+NavHost(
+            navController = navController,
+            startDestination = HabitsRoute,
+            modifier = modifier,
+            enterTransition = { materialSlideFromEndIn() },
+            exitTransition = { materialSlideToEndOut() },
+            popEnterTransition = { materialSlideFromEndIn() },
+            popExitTransition = { materialSlideToEndOut() },
+        ) {
         composable<HabitsRoute>(
-            enterTransition = { sharedAxisXIn() },
-            exitTransition = { sharedAxisXOut() },
-            popEnterTransition = { sharedAxisXIn() },
-            popExitTransition = { sharedAxisXOut() },
+            enterTransition = { materialSharedAxisXIn() },
+            exitTransition = { materialSharedAxisXOut() },
+            popEnterTransition = { materialSharedAxisXIn() },
+            popExitTransition = { materialSharedAxisXOut() },
         ) {
             HabitsScreen(
                 onNavigateToDetail = { navController.navigate(HabitDetailRoute(it)) },
                 onNavigateToAddEdit = { navController.navigate(AddEditHabitRoute(it)) },
                 onNavigateToProfile = { navController.navigate(ProfileRoute) },
+                onNavigateToSettings = { navController.navigate(SettingsRoute) },
             )
         }
 
@@ -68,21 +69,25 @@ fun HabitzyNavHost(
         }
 
         composable<InsightsRoute>(
-            enterTransition = { sharedAxisXIn() },
-            exitTransition = { sharedAxisXOut() },
-            popEnterTransition = { sharedAxisXIn() },
-            popExitTransition = { sharedAxisXOut() },
+            enterTransition = { materialSharedAxisXIn() },
+            exitTransition = { materialSharedAxisXOut() },
+            popEnterTransition = { materialSharedAxisXIn() },
+            popExitTransition = { materialSharedAxisXOut() },
         ) {
-            InsightsScreen()
+            InsightsScreen(
+                onNavigateToProfile = { navController.navigate(ProfileRoute) },
+                onNavigateToSettings = { navController.navigate(SettingsRoute) },
+            )
         }
 
         composable<SettingsRoute>(
-            enterTransition = { sharedAxisXIn() },
-            exitTransition = { sharedAxisXOut() },
-            popEnterTransition = { sharedAxisXIn() },
-            popExitTransition = { sharedAxisXOut() },
+            enterTransition = { materialSharedAxisXIn() },
+            exitTransition = { materialSharedAxisXOut() },
+            popEnterTransition = { materialSharedAxisXIn() },
+            popExitTransition = { materialSharedAxisXOut() },
         ) {
             SettingsScreen(
+                onBack = { navController.popBackStack() },
                 onAccountClick = { navController.navigate(AccountSettingsRoute) },
                 onAppearanceClick = { navController.navigate(AppearanceSettingsRoute) },
                 onPreferencesClick = { navController.navigate(PreferencesSettingsRoute) },

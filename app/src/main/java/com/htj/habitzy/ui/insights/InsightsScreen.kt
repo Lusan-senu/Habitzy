@@ -56,8 +56,10 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.htj.habitzy.domain.model.HabitRankEntry
 import com.htj.habitzy.domain.usecase.InsightPeriod
 import com.htj.habitzy.ui.components.HabitIconChip
+import com.htj.habitzy.ui.components.HabitzyTopActionPill
 import com.htj.habitzy.ui.components.SectionHeader
 import com.htj.habitzy.ui.components.StreakBadge
+import com.htj.habitzy.ui.navigation.FloatingNavClusterContentClearance
 import com.htj.habitzy.ui.theme.DisplayMediumEmphasized
 import com.htj.habitzy.ui.theme.HabitzyShapes
 import com.htj.habitzy.ui.theme.SpaceL
@@ -71,6 +73,8 @@ import kotlin.math.roundToInt
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun InsightsScreen(
+    onNavigateToProfile: () -> Unit,
+    onNavigateToSettings: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: InsightsViewModel = hiltViewModel(),
 ) {
@@ -82,6 +86,13 @@ fun InsightsScreen(
             LargeTopAppBar(
                 title = { Text("Insights") },
                 colors = TopAppBarDefaults.largeTopAppBarColors(),
+                actions = {
+                    HabitzyTopActionPill(
+                        onProfileClick = onNavigateToProfile,
+                        onSettingsClick = onNavigateToSettings,
+                        filterSortAvailable = false,
+                    )
+                },
             )
         },
     ) { innerPadding ->
@@ -136,6 +147,8 @@ fun InsightsScreen(
                     modifier = Modifier.padding(top = SpaceXL, bottom = SpaceXL),
                 )
             }
+
+            Spacer(Modifier.height(FloatingNavClusterContentClearance))
         }
     }
 }

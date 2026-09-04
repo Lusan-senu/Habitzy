@@ -52,6 +52,16 @@ android {
     }
 }
 
+configurations.all {
+    exclude(group = "org.jetbrains.compose.animation")
+    exclude(group = "org.jetbrains.compose.annotation-internal")
+    exclude(group = "org.jetbrains.compose.collection-internal")
+    exclude(group = "org.jetbrains.compose.foundation")
+    exclude(group = "org.jetbrains.compose.material3")
+    exclude(group = "org.jetbrains.compose.runtime")
+    exclude(group = "org.jetbrains.compose.ui")
+}
+
 dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
@@ -62,10 +72,11 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
+    implementation(libs.androidx.material.icons.core)
+    implementation(libs.androidx.material.icons.extended)
     implementation(libs.androidx.material3.adaptive)
     implementation(libs.androidx.material3.adaptive.layout)
     implementation(libs.androidx.material3.adaptive.navigation)
-    implementation(libs.androidx.material3.adaptive.navigation.suite)
     implementation(libs.androidx.navigation.compose)
 
     // Hilt

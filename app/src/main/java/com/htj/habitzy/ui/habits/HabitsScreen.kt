@@ -17,13 +17,9 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LargeTopAppBar
@@ -55,8 +51,10 @@ import com.htj.habitzy.ui.components.EmptyState
 import com.htj.habitzy.ui.components.HabitCard
 import com.htj.habitzy.ui.components.HabitWithTodayLog
 import com.htj.habitzy.ui.components.HabitzySnackbarHost
+import com.htj.habitzy.ui.components.HabitzyTopActionPill
 import com.htj.habitzy.ui.components.SectionHeader
 import com.htj.habitzy.ui.components.rememberHabitzySnackbarHostState
+import com.htj.habitzy.ui.navigation.FloatingNavClusterContentClearance
 import com.htj.habitzy.ui.theme.ShapeFull
 import com.htj.habitzy.ui.theme.SpaceL
 import com.htj.habitzy.ui.theme.SpaceM
@@ -68,7 +66,7 @@ import kotlinx.coroutines.delay
 import sh.calvin.reorderable.ReorderableItem
 import sh.calvin.reorderable.rememberReorderableLazyListState
 
-private val BottomPadding = 88.dp
+private val BottomPadding = FloatingNavClusterContentClearance
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -76,6 +74,7 @@ fun HabitsScreen(
     onNavigateToDetail: (Long) -> Unit,
     onNavigateToAddEdit: (Long?) -> Unit,
     onNavigateToProfile: () -> Unit,
+    onNavigateToSettings: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: HabitsViewModel = hiltViewModel(),
 ) {
@@ -123,18 +122,9 @@ fun HabitsScreen(
             HabitsTopBar(
                 scrollBehavior = scrollBehavior,
                 onProfileClick = onNavigateToProfile,
+                onSettingsClick = onNavigateToSettings,
                 onFilterClick = { showFilterSheet = true },
             )
-        },
-        floatingActionButton = {
-            FloatingActionButton(
-                onClick = { onNavigateToAddEdit(null) },
-                shape = ShapeFull,
-                containerColor = MaterialTheme.colorScheme.primary,
-                contentColor = MaterialTheme.colorScheme.onPrimary,
-            ) {
-                Icon(imageVector = Icons.Filled.Add, contentDescription = "Add habit")
-            }
         },
     ) { innerPadding ->
         Box(
@@ -180,6 +170,7 @@ fun HabitsScreen(
 private fun HabitsTopBar(
     scrollBehavior: androidx.compose.material3.TopAppBarScrollBehavior,
     onProfileClick: () -> Unit,
+    onSettingsClick: () -> Unit,
     onFilterClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -190,28 +181,12 @@ private fun HabitsTopBar(
         colors = TopAppBarDefaults.largeTopAppBarColors(),
         navigationIcon = {},
         actions = {
-            IconButton(onClick = onProfileClick) {
-                Box(
-                    modifier = Modifier
-                        .size(32.dp)
-                        .clip(CircleShape)
-                        .background(MaterialTheme.colorScheme.secondaryContainer),
-                    contentAlignment = Alignment.Center,
-                ) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.ic_person),
-                        contentDescription = "Profile",
-                        tint = MaterialTheme.colorScheme.onSecondaryContainer,
-                        modifier = Modifier.size(20.dp),
-                    )
-                }
-            }
-            IconButton(onClick = onFilterClick) {
-                Icon(
-                    imageVector = Icons.Filled.MoreVert,
-                    contentDescription = "Filter and sort",
-                )
-            }
+            HabitzyTopActionPill(
+                onProfileClick = onProfileClick,
+                onSettingsClick = onSettingsClick,
+                filterSortAvailable = true,
+                onFilterSortClick = onFilterClick,
+            )
         },
     )
 }
